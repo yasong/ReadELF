@@ -2,7 +2,7 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-22 21:44:09
+* @Last Modified time: 2017-05-22 21:51:38
 */
 
 #include <stdio.h>
@@ -56,14 +56,27 @@ void show_header(const u_char *data)
 	printf("	Type: 				");
 	switch(header->e_ident[EI_CLASS])
 	{
-		case 0:
+		case ELFCLASSNONE:
 			printf("Unknown file type\n");
 			break;
-		case 1:
+		case ELFCLASS32:
 			printf("ELF32\n");
 			break;
-		case 2:
+		case ELFCLASS64:
 			printf("ELF64\n");
+			break;
+	}
+	printf("	data				");
+	switch(header->e_ident[EI_DATA])
+	{
+		case ELFDATANONE:
+			printf("Invalid\n");
+			break;
+		case ELFDATA2LSB:
+			printf("2' implemntation, little endian\n");
+			break;
+		case ELFDATA2MSB:
+			printf("Big endian\n");
 			break;
 	}
 }
