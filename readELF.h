@@ -162,6 +162,16 @@ typedef signed long long 		elf64_Sxword;
 #define DT_LOPROC		0x70000000
 #define DT_HIPROC 		0x7fffffff
 
+/** Relocation Types */
+#define R_386_GOT32		3
+#define R_386_PLT32		4
+#define R_386_COPY		5
+#define R_386_GLOB_DAT	6
+#define R_386_JMP_SLOT	7
+#define R_386_RELATRIVE	8
+#define R_386_GOTOFF	9
+#define R_386_GOTPC		10
+
 /** 32-bit ELF Header */
 typedef struct{
 	u_char 			e_ident[EI_NIDENT];
@@ -227,3 +237,14 @@ typedef struct{
 	elf32_Word 		p_flags;
 	elf32_Word 		p_align;
 }elf32_phdr;
+
+/** Dynamic Structure */
+typedef struct{
+	elf32_Sword  	d_tag;
+	union{
+		elf32_Word 	d_val;
+		elf32_Addr 	d_ptr;
+	}d_un;
+}elf32_Dyn;
+
+extern elf32_Dyn _DYNAMIC[];
