@@ -123,6 +123,45 @@ typedef signed long long 		elf64_Sxword;
 #define STT_LOPROC		13
 #define STT_HIPROC		15
 
+/** Segment types */
+#define PT_NULL			0
+#define PT_LOAD			1
+#define PT_DYNAMIC		2
+#define PT_INTERP		3
+#define PT_NOTE			4
+#define PT_SHLIB		5
+#define PT_PHDR			6
+#define PT_LOPROC 		0x70000000
+#define PT_HIPROC		0x7fffffff
+
+/** Dynamic Section */
+#define DT_NULL			0
+#define DT_NEEDED		1
+#define DT_PLTRELSZ		2
+#define DT_PLTGOT		3
+#define DT_HASH			4
+#define DT_STRTAB		5
+#define DT_SYMTAB		6
+#define DT_RELA			7
+#define DT_RELASZ		8
+#define DT_RELAENT		9
+#define DT_STRSZ		10
+#define DT_SYMENT		11
+#define DT_INIT 		12
+#define DT_FINI			13
+#define DT_SONAME		14
+#define DT_RPATH		15
+#define DT_SYMBOLIC		16
+#define DT_REL 			17
+#define DT_RELSZ		18
+#define DT_RELENT 		19
+#define DT_PLTREL 		20
+#define DT_DEBUG 		21
+#define DT_TEXTREL 		22
+#define DT_JMPREL		23
+#define DT_LOPROC		0x70000000
+#define DT_HIPROC 		0x7fffffff
+
 /** 32-bit ELF Header */
 typedef struct{
 	u_char 			e_ident[EI_NIDENT];
