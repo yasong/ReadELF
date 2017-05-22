@@ -33,12 +33,23 @@
 #define EV_CURRENT	1		//Current version
 
 /** Common types */
+/** 32-bit ELF base types */
 typedef unsigned char 	u_char;  		//Unsigned small integer
 typedef unsigned int 	elf32_Addr		//Unsigned program address
 typedef unsigned short	elf32_Half;		//Unsigned medium integer
 typedef	unsigned int 	elf32_Off;		//Unsigned file offset
 typedef signed int 		elf32_Sword;	//Signed large interger
 typedef unsigned int 	elf32_Word;		//Unsigned large integer
+
+/** 64-bit ELF base types */
+typedef unsigned long long 		elf64_Addr;
+typedef	unsigned short 			elf64_Half;
+typedef signed short			elf64_SHalf;
+typedef unsigned long long		elf64_Off;
+typedef signed int 				elf64_Sword;
+typedef unsigned int 			elf64_Word;
+typedef unsigned long long 		elf64_Xword;
+typedef signed long long 		elf64_Sxword;
 
 /** e_type */
 #define ET_NONE		0		//No file type
@@ -85,6 +96,14 @@ typedef unsigned int 	elf32_Word;		//Unsigned large integer
 #define SHT_HIPROC		0x7fffffff	//
 #define SHT_LOUSER		0x80000000	//
 #define SHT_HIUSER		0xffffffff	//
+
+/** sh_flags */
+#define SHF_WRITE		0x1
+#define SHF_ALLOC		0x2
+#define SHF_EXECINSTR	0x4
+#define SHF_MASKPROC	0xf0000000
+
+
 /** ELF Header */
 typedef struct{
 	u_char 			e_ident[EI_NIDENT];
