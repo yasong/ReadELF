@@ -40,6 +40,26 @@ typedef	unsigned int 	elf32_Off;		//Unsigned file offset
 typedef signed int 		elf32_Sword;	//Signed large interger
 typedef unsigned int 	elf32_Word;		//Unsigned large integer
 
+/** e_type */
+#define ET_NONE		0		//No file type
+#define ET_REL		1 		//Relocatable file
+#define	ET_EXEC		2		//Executable file
+#define	ET_DYN		3		//Shared object file
+#define ET_CORE		4		//Core file
+#define ET_LOPROC	0xff00	//Processor-specific
+#define	ET_HIPROC	0xffff	//Processor-specofic
+
+/** e_machine */
+#define EM_NONE		0		//No machine
+#define EM_M32		1		//AT&T WE 32100
+#define EM_SPARC	2		//SPARC
+#define	EM_386		3		//Intel 80386
+#define	EM_68K		4		//Motorola 68000
+#define EM_88K		5		//Motorola 88000
+#define EM_860		7		//Intel 80860
+#define EM_MIPS 	8  		//MIPS RS3000
+
+/** ELF Header */
 typedef struct{
 	u_char 			e_ident[EI_NIDENT];
 	elf32_Half		e_type;
