@@ -103,8 +103,27 @@ typedef signed long long 		elf64_Sxword;
 #define SHF_EXECINSTR	0x4
 #define SHF_MASKPROC	0xf0000000
 
+/** st_info */
+#define ELF32_ST_BIND(i)		((i)>>4)
+#define ELF32_ST_TYPE(i)		((i)&0xf)
+#define ELF32_ST_INFO(b, t)		(((b)<<4) + ((t)&0xf))
 
-/** ELF Header */
+/** stb bind type */
+#define STB_LOCAL		0
+#define STB_GLOBAL		1
+#define STB_WEAK		2
+#define STB_LOPROC		13
+#define STB_HIPROC		15
+
+/** ELF32_ST_TYPE */
+#define STT_NOTYPE		0
+#define STT_OBJECT		1
+#define STT_SECTION		3
+#define STT_FILE		4
+#define STT_LOPROC		13
+#define STT_HIPROC		15
+
+/** 32-bit ELF Header */
 typedef struct{
 	u_char 			e_ident[EI_NIDENT];
 	elf32_Half		e_type;				//Object file type
@@ -122,6 +141,7 @@ typedef struct{
 	elf32_Half		e_shstrndx;
 }elf32_Ehdr;
 
+/** 32-bit ELF Section Header */
 typedef struct{
 	elf32_Word		sh_name;
 	elf32_Word 		sh_type;
@@ -134,3 +154,37 @@ typedef struct{
 	elf32_Word 		sh_addralign;
 	elf32_Word 		sh_entsize;
 }elf32_Shdr;
+
+/** 32-bit ELF Symbol Table */
+typedef struct{
+	elf32_Word 		st_name;
+	elf32_Addr		st_value;
+	elf32_Word 		st_size;
+	u_char			st_info;
+	u_char			st_other;
+	elf32_Half		st_shndx;
+}elf32_sym;
+
+/** rellocate */
+typedef struct{
+	elf32_Addr 		r_offset;
+	elf32_Word 		r_info;
+}elf32_Rel;
+
+typedef struct{
+	elf32_Addr 		r_offset;
+	elf32_Word 		r_info;
+	elf32_Word 		r_addend;
+}elf32_Rela;
+
+/** Program Header */
+typedef struct{
+	elf32_Word 		p_type;
+	elf32_Off		p_offset;
+	elf32_Addr 		p_vaddr;
+	elf32_Addr		p_paddr;
+	elf32_Word 		p_filesz;
+	elf32_Word 		p_memsz;
+	elf32_Word 		p_flags;
+	elf32_Word 		p_align;
+}elf32_phdr;
