@@ -2,11 +2,12 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-22 19:52:03
+* @Last Modified time: 2017-05-22 21:44:09
 */
 
 #include <stdio.h>
-//#include "readELF.h"
+#include "readELF.h"
+#define MAX_LEN		1024*1024
 const char software_name[] = "readELF";
 
 void show_usage();
@@ -24,30 +25,46 @@ void show_usage()
            "  -h <elf file> : display the header information\n\n"
            "  -a <elf file> : display all the information\n\n"
            "  -s <elf file> : display the section information\n\n"
-           "  -v : Displaye the version number of readELF"
+           "  -v : Displaye the version number of readELF\n\n"
         );
     printf("or\n\n");
     printf("Usage: ./%s<elf file>\n\n", software_name);
-    printf("then after the 'cmd>' come\n", );
+    printf("then after the 'cmd>' come\n");
     printf("you can input the command:\n"
     	   "  H : show the usage information\n\n"
            "  h : display the header information\n\n"
            "  a : display all the information\n\n"
            "  s : display the section information\n\n"
            "  v : Displaye the version number of readELF"
-           "  e : exit the command shell"
+           "  q: quit the command shell\n\n"
     	);
 
 }
-void show_header(FILE *elf)
+void show_header(const u_char *data)
 {
-	u_char ei_indent[EI_NIDENT];
+	elf32_Ehdr *header;
 	int i;
+
+	header = (elf32_Ehdr *)data;
 	printf("ELF Header:\n");
 	printf(" 	Magic: 	");
 	for (i = 0; i < EI_NIDENT; ++i)
 	{
-		printf("%x ",ei_indent[i]);
+		printf("%x ",header->e_ident[i]);
+	}
+	printf("\n");
+	printf("	Type: 				");
+	switch(header->e_ident[EI_CLASS])
+	{
+		case 0:
+			printf("Unknown file type\n");
+			break;
+		case 1:
+			printf("ELF32\n");
+			break;
+		case 2:
+			printf("ELF64\n");
+			break;
 	}
 }
 
@@ -67,7 +84,7 @@ void show_version()
 	printf("Copyright (C) YinXiaokang\n");
 }
 
-void read_elf(FILE *elf)
+void read_elf(const u_char *data)
 {
 
 }
@@ -75,7 +92,9 @@ int main(int argc, char *argv[])
 {
 	char *option;
 	char cmd;
-	FILE *elf;
+	u_char buf[MAX_LEN];
+	int len = 0;
+	FILE  *elf;
 	if (argc == 1)
 	{
 		show_usage();
@@ -89,17 +108,26 @@ int main(int argc, char *argv[])
 			show_usage();
 			return 0;
 		}
-		else
+		if(strcmp(argv[1],"-v") == 0)
 		{
-			if(elf = fopen(argv[1], "wb") == NULL)
+			show_version();
+			return 0;
+		}
+		else
+		{	printf("argc =  %d\n", argc);
+			printf("file name %s\n",argv[1]);
+			elf = fopen(argv[1], "rb+") ;
+			if(elf == NULL)
 			{
 				printf("Open error\n");
-				printf("FIle %s cannot be opened\n", argv[1]);
-				exit();
+				printf("File %s cannot be opened\n", argv[1]);
+				exit(-1);
 			}
+			len = fread(buf,1,MAX_LEN,elf);
+			buf[len] = '\0';
 			printf("cmd> ");
-			scanf("%c",cmd);
-			while(cmd != 'e')
+			scanf("%c",&cmd);
+			while(cmd != 'q')
 			{
 				switch(cmd)
 				{
@@ -107,7 +135,7 @@ int main(int argc, char *argv[])
 						show_usage();
 						break;
 					case 'h':
-						show_header();
+						show_header(buf);
 						break;
 					case 's':
 						show_section();
@@ -121,6 +149,9 @@ int main(int argc, char *argv[])
 					default:
 						break;
 				}
+				printf("cmd> ");
+				scanf("%c",&cmd);
+				scanf("%c",&cmd);
 			}
 			fclose(elf);
 			return 0;
@@ -129,19 +160,22 @@ int main(int argc, char *argv[])
 		
 	}
 	option = argv[1];
-	if(elf = fopen(argv[1], "wb") == NULL)
+	elf = fopen(argv[2], "rb+") ;
+	if(elf == NULL)
 	{
 		printf("Open error\n");
-		printf("FIle %s cannot be opened\n", argv[1]);
-		exit();
+		printf("FIle %s cannot be opened\n", argv[2]);
+		exit(-1);
 	}
+	len = fread(buf,1,MAX_LEN,elf);
+	buf[len] = '\0';
 	switch(option[1])
 	{
 		case 'H':
 			show_usage();
 			break;
 		case 'h':
-			show_header();
+			show_header(buf);
 			break;
 		case 's':
 			show_section();

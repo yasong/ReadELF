@@ -6,6 +6,7 @@
 */
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 /** e_ident identification indexes */
 #define EI_NIDENT 	16		//Size of e_ident[]
@@ -35,7 +36,7 @@
 /** Common types */
 /** 32-bit ELF base types */
 typedef unsigned char 	u_char;  		//Unsigned small integer
-typedef unsigned int 	elf32_Addr		//Unsigned program address
+typedef unsigned int 	elf32_Addr;		//Unsigned program address
 typedef unsigned short	elf32_Half;		//Unsigned medium integer
 typedef	unsigned int 	elf32_Off;		//Unsigned file offset
 typedef signed int 		elf32_Sword;	//Signed large interger
@@ -186,7 +187,7 @@ typedef struct{
 	elf32_Half		e_phentsize;
 	elf32_Half		e_phnum;
 	elf32_Half		e_shentsize;
-	elf32_Half		e_shnuml
+	elf32_Half		e_shnuml;
 	elf32_Half		e_shstrndx;
 }elf32_Ehdr;
 
