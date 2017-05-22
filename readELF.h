@@ -59,15 +59,41 @@ typedef unsigned int 	elf32_Word;		//Unsigned large integer
 #define EM_860		7		//Intel 80860
 #define EM_MIPS 	8  		//MIPS RS3000
 
+/** section header tables */
+#define	SHN_UNDEF		0			//Undefined, missing, irrelevant 
+#define SHN_LORESERVE	0xff00		//The lower bound of the range of reserved indexes
+#define SHN_LOPROC		0xff00		//Reserved for processor-specific semantics
+#define SHN_HIPROC		0xff1f		//Reserved for processor-specific semantics
+#define SHN_ABS			0xfff1		//This value specifies absolute values for the corresponding reference
+#define SHN_COMMON		0xfff2		//Symbols defined relative to this section are common symbols
+#define SHN_HIRESERVE	0xffff		//This value specifies the upper bound of the range of reserved indexes
+
+/** sh_type */
+#define SHT_NULL		0			//Marks the section header as inactive
+#define SHT_PROGBITS	1			//Hold information defined by the program, whose format and meaning are determined solely
+#define SHT_SYMTAB		2			//Hold a symbol table. Provides symblos for link editing
+#define SHT_STRTAB		3			//
+#define SHT_RELA		4			//
+#define SHT_HASH		5			//
+#define SHT_DYNAMIC		6			//
+#define SHT_NOTE		7			//
+#define SHT_NOBITS 		8			//
+#define SHT_REL 		9			//
+#define SHT_SHLIB		10			//
+#define SHT_DYNSYM		11			//
+#define SHT_LOPROC		0x70000000	//
+#define SHT_HIPROC		0x7fffffff	//
+#define SHT_LOUSER		0x80000000	//
+#define SHT_HIUSER		0xffffffff	//
 /** ELF Header */
 typedef struct{
 	u_char 			e_ident[EI_NIDENT];
-	elf32_Half		e_type;
-	elf32_Half		e_machine;
-	elf32_Word 		e_version;
-	elf32_Addr 		e_entry;
-	elf32_Off		e_phoff;
-	elf32_Off		e_shoff;
+	elf32_Half		e_type;				//Object file type
+	elf32_Half		e_machine;			//Architecture
+	elf32_Word 		e_version;			//Object file version
+	elf32_Addr 		e_entry;			//Virtual address which the system first transfers control
+	elf32_Off		e_phoff;			//Program header tables's file offset in bytes
+	elf32_Off		e_shoff;			//Section header tables's file offset in bytes
 	elf32_Word 		e_flags;
 	elf32_Half 		e_ehsize;
 	elf32_Half		e_phentsize;
@@ -76,3 +102,16 @@ typedef struct{
 	elf32_Half		e_shnuml
 	elf32_Half		e_shstrndx;
 }elf32_Ehdr;
+
+typedef struct{
+	elf32_Word		sh_name;
+	elf32_Word 		sh_type;
+	elf32_Word   	sh_flags;
+	elf32_Addr		sh_addr;
+	elf32_Off		sh_offset;
+	elf32_Word 		sh_size;
+	elf32_Word  	sh_link;
+	elf32_Word 		sh_info;
+	elf32_Word 		sh_addralign;
+	elf32_Word 		sh_entsize;
+}elf32_Shdr;
