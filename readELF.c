@@ -2,7 +2,7 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-23 10:05:56
+* @Last Modified time: 2017-05-23 21:34:08
 */
 
 #include <stdio.h>
@@ -14,33 +14,34 @@ const char software_name[] = "readELF";
 u_char buf[MAX_LEN];
 
 void show_usage();
-void show_header();
+void show_header(const u_char *data);
+void show_program_header(const u_char *data);
 void show_section();
 void show_all();
 void show_version();
 
 void show_usage()
 {
-    printf("Usage: ./%s [options] <elf file>\n\n", software_name);
+	printf("Usage: ./%s [options] <elf file>\n\n", software_name);
 
-    printf("Available options:\n"
-           "  -H : show the usage information\n\n"
-           "  -h <elf file> : display the header information\n\n"
-           "  -a <elf file> : display all the information\n\n"
-           "  -s <elf file> : display the section information\n\n"
-           "  -v : Displaye the version number of readELF\n\n"
-        );
-    printf("or\n\n");
-    printf("Usage: ./%s<elf file>\n\n", software_name);
-    printf("then after the 'cmd>' come\n");
-    printf("you can input the command:\n"
-    	   "  H : show the usage information\n\n"
-           "  h : display the header information\n\n"
-           "  a : display all the information\n\n"
-           "  s : display the section information\n\n"
-           "  v : Displaye the version number of readELF"
-           "  q: quit the command shell\n\n"
-    	);
+	printf("Available options:\n"
+		   "  -H : show the usage information\n\n"
+		   "  -h <elf file> : display the header information\n\n"
+		   "  -a <elf file> : display all the information\n\n"
+		   "  -s <elf file> : display the section information\n\n"
+		   "  -v : Displaye the version number of readELF\n\n"
+		);
+	printf("or\n\n");
+	printf("Usage: ./%s<elf file>\n\n", software_name);
+	printf("then after the 'cmd>' come\n");
+	printf("you can input the command:\n"
+		   "  H : show the usage information\n\n"
+		   "  h : display the header information\n\n"
+		   "  a : display all the information\n\n"
+		   "  s : display the section information\n\n"
+		   "  v : Displaye the version number of readELF"
+		   "  q: quit the command shell\n\n"
+		);
 
 }
 void show_header(const u_char *data)
@@ -50,13 +51,13 @@ void show_header(const u_char *data)
 
 	header = (elf32_Ehdr *)data;
 	printf("ELF Header:\n");
-	printf(" 	Magic: 	");
+	printf("\tMagic: \t");
 	for (i = 0; i < EI_NIDENT; ++i)
 	{
 		printf("%x ",header->e_ident[i]);
 	}
 	printf("\n");
-	printf("	Class: 				");
+	printf("\tClass:\t\t\t\t");
 	switch(header->e_ident[EI_CLASS])
 	{
 		case ELFCLASSNONE:
@@ -69,7 +70,7 @@ void show_header(const u_char *data)
 			printf("ELF64\n");
 			break;
 	}
-	printf("	Data				");
+	printf("\tData:\t\t\t\t");
 	switch(header->e_ident[EI_DATA])
 	{
 		case ELFDATANONE:
@@ -82,7 +83,7 @@ void show_header(const u_char *data)
 			printf("Big endian\n");
 			break;
 	}
-	printf("	Version				");
+	printf("\tVersion:\t\t\t");
 	switch(header->e_ident[EI_VERSION])
 	{
 		case EV_NONE:
@@ -91,11 +92,11 @@ void show_header(const u_char *data)
 		case EV_CURRENT:
 			printf("1 (current)\n");
 	}
-	printf("	OS/ABI				");
+	printf("\tOS/ABI:\t\t\t\t");
 	switch(header->e_ident[EI_OSABI])
 	{
 		case 0x00:
-			printf("System V\n");
+			printf("UNIX System V \n");
 			break;
 		case 0x01:
 			printf("HP-UX\n");
@@ -152,7 +153,7 @@ void show_header(const u_char *data)
 			printf("Unknown\n");
 			break;
 	}
-	printf("	Type				");
+	printf("\tType:\t\t\t\t");
 	switch(header->e_type)
 	{
 		case ET_NONE:
@@ -174,7 +175,7 @@ void show_header(const u_char *data)
 			printf("Processor-specific\n");
 			break;
 	}
-	printf("	System Architecture		");
+	printf("\tSystem Architecture:\t\t");
 	switch(header->e_machine)
 	{
 		case EM_NONE:
@@ -203,7 +204,7 @@ void show_header(const u_char *data)
 		default:
 			printf("Unknown\n");
 	}
-	printf("	Version				");
+	printf("\tVersion:\t\t\t");
 	switch(header->e_version)
 	{
 		case EV_NONE:
@@ -215,21 +216,159 @@ void show_header(const u_char *data)
 		default:
 			printf("Unknown\n");
 	}
-	printf("	Entry				0x%x\n", header->e_entry);
-	printf("	Program Header		 	%d (bytes into file)\n", header->e_phoff);
-	printf("	section Header			%d (bytes into file)\n", header->e_shoff);
-	printf("	Flag				0x%x\n", header->e_flags);
-	printf("	Header size			%d (bytes)\n", header->e_ehsize);
-	printf("	Program header size		%d (bytes)\n", header->e_phentsize);
-	printf("	Program headers size		%d\n", header->e_phnum);
-	printf("	Section header size 		%d\n", header->e_shentsize);
-	printf("	Section header number		%d\n", header->e_shnum);
-	printf("	String index number		%d\n", header->e_shstrndx);
+	printf("\tEntry:\t\t\t\t0x%x\n", header->e_entry);
+	printf("\tProgram Header:\t\t\t%d (bytes into file)\n", header->e_phoff);
+	printf("\tsection Header:\t\t\t%d (bytes into file)\n", header->e_shoff);
+	printf("\tFlag:\t\t\t\t0x%x\n", header->e_flags);
+	printf("\tHeader size:\t\t\t%d (bytes)\n", header->e_ehsize);
+	printf("\tProgram header size:\t\t%d (bytes)\n", header->e_phentsize);
+	printf("\tProgram header number:\t\t%d\n", header->e_phnum);
+	printf("\tSection header size:\t\t%d\n", header->e_shentsize);
+	printf("\tSection header number:\t\t%d\n", header->e_shnum);
+	printf("\tString index number:\t\t%d\n", header->e_shstrndx);
+}
+void show_program_header(const u_char *data)
+{
+	elf32_phdr *pheader;
+	elf32_Ehdr *header;
+	int i, j;
+	int num;
+	char flag[4] ={' ',' ',' ',' '};
+	header = (elf32_Ehdr*)data;
+	pheader = (elf32_phdr *) (data + sizeof(*header));
+	num = header->e_phnum;
+	printf("Program header number: \t%d,",num);
+	printf("start at offset %d\n", sizeof(*header));
+	printf("ELF file type:");
+	switch(header->e_type)
+	{
+		case ET_NONE:
+			printf("Invalid\n");
+			break;
+		case ET_REL:
+			printf("Relocatable file\n");
+			break;
+		case ET_EXEC:
+			printf("Executable file\n");
+			break;
+		case ET_DYN:
+			printf("Shared object file\n");
+			break;
+		case ET_CORE:
+			printf("Core file\n");
+			break;
+		case ET_LOPROC:
+			printf("Processor-specific\n");
+			break;
+	}
+	printf("\tEntry:\t\t\t0x%x\n", header->e_entry);
+
+	printf("Program header:\n");
+	printf("\tType\t\tOffset\t VAddr\t    PAddr\tFSize\t MemSize   Flag  Align\n");
+	for (i = 0; i < num; ++i)
+	{
+		printf("\t");
+		switch(pheader->p_type)
+		{	
+			case PT_NULL:
+				printf("Invalid\t");
+				break;
+			case PT_LOAD:
+				printf("LOAD \t");
+				break;
+			case PT_DYNAMIC:
+				printf("DYNAMIC\t");
+				break;
+			case PT_INTERP:
+				printf("INTERP\t");
+				break;
+			case PT_NOTE:
+				printf("NOTE \t");
+				break;
+			case PT_SHLIB:
+				printf("SHLIB\t");
+				break;
+			case PT_PHDR:
+				printf("PHDR\t");
+				break;
+			case PT_TLS:
+				printf("TLS\t");
+				break;
+			case PT_NUM:
+				printf("NUM\t");
+				break;
+			case PT_LOOS:
+				printf("LOOS\t");
+				break;
+			case PT_GNU_EH_FRAME:
+				printf("GNU_EH_FRAME   ");
+				break;
+			case PT_GNU_STACK:
+				printf("GNU_STACK  ");
+				break;
+			case PT_GNU_RELRO:
+				printf("GNU_RELRO  ");
+				break;
+			case PT_L4_STACK:
+				printf("L4_STACK  ");
+				break;
+			case PT_L4_KIP:
+				printf("L4_KIP  ");
+				break;
+			case PT_L4_AUX:
+				printf("L4_AUX  ");
+				break;
+			default:
+				printf("Unknown  ");
+				break;
+		}
+		switch(pheader->p_flags)
+		{
+			case 0x01:
+				flag[2]='X';
+				break;
+			case 0x02:
+				flag[1]='W';
+				break;
+			case 0x03:
+				flag[1]='W';
+				flag[2]='X';
+				break;
+			case 0x04:
+				flag[0]='R';
+				break;
+			case 0x05:
+				flag[0]='R';
+				flag[2]='X';
+				break;
+			case 0x06:
+				flag[0]='R';
+				flag[1]='W';
+				break;
+			case 0x07:
+				flag[0]='R';
+				flag[1]='W';
+				flag[2]='X';
+				break;
+		}
+		flag[3]='\0';
+		printf("\t0x%06x 0x%08x 0x%08x  0x%06x 0x%06x", 
+				pheader->p_offset,pheader->p_vaddr,pheader->p_paddr,pheader->p_filesz,pheader->p_memsz);
+		printf("  %s",flag);
+		printf("  0x%x\n",pheader->p_align);
+		if(pheader->p_type == PT_INTERP)
+		{
+			printf("\t \t[Requesting program interpreter: /lib/ld-linux.so.2]\n");
+		}
+		pheader = (elf32_phdr*)(data + sizeof(*header)+ (i+1) * sizeof(*pheader));
+		for(j = 0; j < 4;++j)
+		{
+			flag[j]=' ';
+		}
+	}
 	
 
-
 }
-
 void show_section()
 {
 	printf("section:\n");
@@ -299,6 +438,9 @@ int main(int argc, char *argv[])
 					case 'h':
 						show_header(buf);
 						break;
+					case 'p':
+						show_program_header(buf);
+						break;
 					case 's':
 						show_section();
 						break;
@@ -339,6 +481,9 @@ int main(int argc, char *argv[])
 		case 'h':
 			show_header(buf);
 			break;
+		case 'p':
+			show_program_header(buf);
+			break;
 		case 's':
 			show_section();
 			break;
@@ -352,5 +497,5 @@ int main(int argc, char *argv[])
 			break;
 	}
 	fclose(elf);
-    return 0;
+	return 0;
 }
