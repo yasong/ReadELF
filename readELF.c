@@ -2,7 +2,7 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-23 08:49:42
+* @Last Modified time: 2017-05-23 10:05:56
 */
 
 #include <stdio.h>
@@ -86,10 +86,10 @@ void show_header(const u_char *data)
 	switch(header->e_ident[EI_VERSION])
 	{
 		case EV_NONE:
-			printf("Invalid\n", );
+			printf("Invalid\n");
 			break;
 		case EV_CURRENT:
-			printf("1 (current)\n", );
+			printf("1 (current)\n");
 	}
 	printf("	OS/ABI				");
 	switch(header->e_ident[EI_OSABI])
@@ -174,7 +174,58 @@ void show_header(const u_char *data)
 			printf("Processor-specific\n");
 			break;
 	}
-
+	printf("	System Architecture		");
+	switch(header->e_machine)
+	{
+		case EM_NONE:
+			printf("Invalid\n");
+			break;
+		case EM_M32:
+			printf("AT&T WE  32100\n");
+			break;
+		case EM_SPARC:
+			printf("SPARC\n");
+			break;
+		case EM_386:
+			printf("Intel 80386\n");
+			break;
+		case EM_68K:
+			printf("Motorola 68000\n");
+			break;
+		case EM_88K:
+			printf("Motorola 88000\n");
+			break;
+		case EM_860:
+			printf("Intel 80860\n");
+			break;
+		case EM_MIPS:
+			printf("MIPS RS3000\n");
+		default:
+			printf("Unknown\n");
+	}
+	printf("	Version				");
+	switch(header->e_version)
+	{
+		case EV_NONE:
+			printf("0x00\n");
+			break;
+		case EV_CURRENT:
+			printf("0x01\n");
+			break;
+		default:
+			printf("Unknown\n");
+	}
+	printf("	Entry				0x%x\n", header->e_entry);
+	printf("	Program Header		 	%d (bytes into file)\n", header->e_phoff);
+	printf("	section Header			%d (bytes into file)\n", header->e_shoff);
+	printf("	Flag				0x%x\n", header->e_flags);
+	printf("	Header size			%d (bytes)\n", header->e_ehsize);
+	printf("	Program header size		%d (bytes)\n", header->e_phentsize);
+	printf("	Program headers size		%d\n", header->e_phnum);
+	printf("	Section header size 		%d\n", header->e_shentsize);
+	printf("	Section header number		%d\n", header->e_shnum);
+	printf("	String index number		%d\n", header->e_shstrndx);
+	
 
 
 }

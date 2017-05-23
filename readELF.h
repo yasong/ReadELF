@@ -134,8 +134,18 @@ typedef signed long long 			elf64_Sxword;
 #define PT_NOTE			4
 #define PT_SHLIB			5
 #define PT_PHDR			6
+#define PT_TLS    			7    
+#define PT_NUM    			8    
+#define PT_LOOS   			0x60000000 
+#define PT_HIOS   			0x6fffffff 
 #define PT_LOPROC 		0x70000000
 #define PT_HIPROC		0x7fffffff
+#define PT_GNU_EH_FRAME 	(PT_LOOS + 0x474e550) 
+#define PT_GNU_STACK    	(PT_LOOS + 0x474e551) 
+#define PT_GNU_RELRO    	(PT_LOOS + 0x474e552) 
+#define PT_L4_STACK     	(PT_LOOS + 0x12) 
+#define PT_L4_KIP       		(PT_LOOS + 0x13) 
+#define PT_L4_AUX       		(PT_LOOS + 0x14) 
 
 /** Dynamic Section */
 #define DT_NULL			0
@@ -189,7 +199,7 @@ typedef struct{
 	elf32_Half		e_phentsize;
 	elf32_Half		e_phnum;
 	elf32_Half		e_shentsize;
-	elf32_Half		e_shnuml;
+	elf32_Half		e_shnum;
 	elf32_Half		e_shstrndx;
 }elf32_Ehdr;
 
