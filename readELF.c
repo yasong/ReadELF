@@ -2,7 +2,7 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-23 21:34:08
+* @Last Modified time: 2017-05-23 22:11:11
 */
 
 #include <stdio.h>
@@ -16,8 +16,8 @@ u_char buf[MAX_LEN];
 void show_usage();
 void show_header(const u_char *data);
 void show_program_header(const u_char *data);
-void show_section();
-void show_all();
+void show_section_header(const u_char *data);
+void show_all(const u_char *data);
 void show_version();
 
 void show_usage()
@@ -28,7 +28,7 @@ void show_usage()
 		   "  -H : show the usage information\n\n"
 		   "  -h <elf file> : display the header information\n\n"
 		   "  -a <elf file> : display all the information\n\n"
-		   "  -s <elf file> : display the section information\n\n"
+		   "  -S<elf file> : display the section  header information\n\n"
 		   "  -v : Displaye the version number of readELF\n\n"
 		);
 	printf("or\n\n");
@@ -38,7 +38,7 @@ void show_usage()
 		   "  H : show the usage information\n\n"
 		   "  h : display the header information\n\n"
 		   "  a : display all the information\n\n"
-		   "  s : display the section information\n\n"
+		   "  S : display the section  header information\n\n"
 		   "  v : Displaye the version number of readELF"
 		   "  q: quit the command shell\n\n"
 		);
@@ -369,12 +369,30 @@ void show_program_header(const u_char *data)
 	
 
 }
-void show_section()
+void show_section_header(const u_char *data)
 {
-	printf("section:\n");
+	elf32_Ehdr *header;
+	elf32_Shdr *sheader;
+	int i, j;
+	int num;
+	int s_off;
+
+	header = (elf32_Ehdr*)data;
+	num =  header->e_shnum;
+	s_off = header->e_shoff;
+	printf("Total %d section header, start from address 0x%x:\n\n", num,s_off);
+	sheader = (elf32_Shdr*)(data + s_off);
+	printf("Section header:\n");
+	printf(" [Nr] Name\t\tType\tAddr\tOff\tSize\tLk\tInf\tAli\tEs\n");
+	for(i = 0; i < num; ++i)
+	{
+		printf("[%2d] %x\t", i,sheader->sh_name );
+		printf("%06x\n",sheader->sh_addr );
+		sheader = (elf32_Shdr*)(data + (i + 1) * sizeof(*sheader) + s_off);
+	}
 }
 
-void show_all()
+void show_all(const u_char *data)
 {
 	printf("all:\n");
 }
@@ -441,11 +459,11 @@ int main(int argc, char *argv[])
 					case 'p':
 						show_program_header(buf);
 						break;
-					case 's':
-						show_section();
+					case 'S':
+						show_section_header(buf);
 						break;
 					case 'a':
-						show_all();
+						show_all(buf);
 						break;
 					case 'v':
 						show_version();
@@ -484,11 +502,11 @@ int main(int argc, char *argv[])
 		case 'p':
 			show_program_header(buf);
 			break;
-		case 's':
-			show_section();
+		case 'S':
+			show_section_header(buf);
 			break;
 		case 'a':
-			show_all();
+			show_all(buf);
 			break;
 		case 'v':
 			show_version();
