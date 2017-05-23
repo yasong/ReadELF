@@ -2,13 +2,16 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-22 21:51:38
+* @Last Modified time: 2017-05-23 08:49:42
 */
 
 #include <stdio.h>
 #include "readELF.h"
-#define MAX_LEN		1024*1024
+#define MAX_LEN		60*1024*1024
 const char software_name[] = "readELF";
+
+
+u_char buf[MAX_LEN];
 
 void show_usage();
 void show_header();
@@ -53,7 +56,7 @@ void show_header(const u_char *data)
 		printf("%x ",header->e_ident[i]);
 	}
 	printf("\n");
-	printf("	Type: 				");
+	printf("	Class: 				");
 	switch(header->e_ident[EI_CLASS])
 	{
 		case ELFCLASSNONE:
@@ -66,7 +69,7 @@ void show_header(const u_char *data)
 			printf("ELF64\n");
 			break;
 	}
-	printf("	data				");
+	printf("	Data				");
 	switch(header->e_ident[EI_DATA])
 	{
 		case ELFDATANONE:
@@ -79,6 +82,101 @@ void show_header(const u_char *data)
 			printf("Big endian\n");
 			break;
 	}
+	printf("	Version				");
+	switch(header->e_ident[EI_VERSION])
+	{
+		case EV_NONE:
+			printf("Invalid\n", );
+			break;
+		case EV_CURRENT:
+			printf("1 (current)\n", );
+	}
+	printf("	OS/ABI				");
+	switch(header->e_ident[EI_OSABI])
+	{
+		case 0x00:
+			printf("System V\n");
+			break;
+		case 0x01:
+			printf("HP-UX\n");
+			break;
+		case 0x02:
+			printf("NetBSD\n");
+			break;
+		case 0x03:
+			printf("Linux\n");
+			break;
+		case 0x04:
+			printf("GNU Hurd\n");
+			break;
+		case 0x06:
+			printf("Solaris\n");
+			break;
+		case 0x07:
+			printf("AIX\n");
+			break;
+		case 0x08:
+			printf("IRIX\n");
+			break;
+		case 0x09:
+			printf("FreeBSD\n");
+			break;
+		case 0x0A:
+			printf("Tru64\n");
+			break;
+		case 0x0B:
+			printf("Novell Modesto\n");
+			break;
+		case 0x0C:
+			printf("Open BSD\n");
+			break;
+		case 0x0D:
+			printf("OpenVMS\n");
+			break;
+		case 0x0E:
+			printf("NonStop Kernel\n");
+			break;
+		case 0x0F:
+			printf("AROS\n");
+			break;
+		case 0x10:
+			printf("Fenix OS\n");
+			break;
+		case 0x11:
+			printf("CloudABI\n");
+			break;
+		case 0x53:
+			printf("Sortix\n");
+			break;
+		default:
+			printf("Unknown\n");
+			break;
+	}
+	printf("	Type				");
+	switch(header->e_type)
+	{
+		case ET_NONE:
+			printf("Invalid\n");
+			break;
+		case ET_REL:
+			printf("Relocatable file\n");
+			break;
+		case ET_EXEC:
+			printf("Executable file\n");
+			break;
+		case ET_DYN:
+			printf("Shared object file\n");
+			break;
+		case ET_CORE:
+			printf("Core file\n");
+			break;
+		case ET_LOPROC:
+			printf("Processor-specific\n");
+			break;
+	}
+
+
+
 }
 
 void show_section()
@@ -105,7 +203,7 @@ int main(int argc, char *argv[])
 {
 	char *option;
 	char cmd;
-	u_char buf[MAX_LEN];
+	//u_char buf[MAX_LEN];
 	int len = 0;
 	FILE  *elf;
 	if (argc == 1)
