@@ -2,7 +2,7 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-23 22:11:11
+* @Last Modified time: 2017-05-24 09:37:18
 */
 
 #include <stdio.h>
@@ -17,6 +17,7 @@ void show_usage();
 void show_header(const u_char *data);
 void show_program_header(const u_char *data);
 void show_section_header(const u_char *data);
+void show_section_name(const u_char *data);
 void show_all(const u_char *data);
 void show_version();
 
@@ -376,22 +377,100 @@ void show_section_header(const u_char *data)
 	int i, j;
 	int num;
 	int s_off;
+	u_char *name;
 
 	header = (elf32_Ehdr*)data;
 	num =  header->e_shnum;
 	s_off = header->e_shoff;
 	printf("Total %d section header, start from address 0x%x:\n\n", num,s_off);
-	sheader = (elf32_Shdr*)(data + s_off);
+	//sheader = (elf32_Shdr*)(data + s_off);
 	printf("Section header:\n");
-	printf(" [Nr] Name\t\tType\tAddr\tOff\tSize\tLk\tInf\tAli\tEs\n");
+	printf(" [Nr] %-19s%-9s%-9s%-7s%-5s%-5s%-3s%-4s%-3s%-3s\n","Name","Type","Addr","Off","Size","Flag","Lk","Inf","Ali","Es");
+	sheader = (elf32_Shdr*)(data + s_off +  sizeof(*sheader) * (header->e_shstrndx));
+	name = (u_char *)(data + sheader->sh_offset);
 	for(i = 0; i < num; ++i)
-	{
-		printf("[%2d] %x\t", i,sheader->sh_name );
-		printf("%06x\n",sheader->sh_addr );
-		sheader = (elf32_Shdr*)(data + (i + 1) * sizeof(*sheader) + s_off);
+	{	sheader = (elf32_Shdr*)(data + i * sizeof(*sheader) + s_off);
+		//printf("%x\n",*(name + sheader->sh_name) );
+		printf("[%2d] %-19s", i,name + sheader->sh_name );
+		
+		switch(sheader->sh_type)
+		{
+			case SHT_NULL:
+				printf("%-9s","NULL");
+				break;
+			case SHT_PROGBITS:
+				printf("%-9s","PROGBITS");
+				break;
+			case SHT_SYMTAB:
+				printf("%-9s","SYMTAB");
+				break;
+			case SHT_STRTAB:
+				printf("%-9s","STRTAB");
+				break;
+			case SHT_RELA:
+				printf("%-9s","RELA");
+				break;
+			case SHT_HASH:
+				printf("%-9s","HASH");
+				break;
+			case SHT_DYNAMIC:
+				printf("%-9s","DYNAMIC");
+				break;
+			case SHT_NOTE:
+				printf("%-9s","NOTE");
+				break;
+			case SHT_NOBITS:
+				printf("%-9s","NOBITS");
+				break;
+			case SHT_REL:
+				printf("%-9s","REL");
+				break;
+			case SHT_SHLIB:
+				printf("%-9s","SHLIB");
+				break;
+			case SHT_DYNSYM:
+				printf("%-9s","DYNSYM");
+				break;
+			case SHT_LOPROC:
+				printf("%-9s","LOPROC");
+				break;
+			case SHT_HIPROC:
+				printf("%-9s","HIPROC");
+				break;
+			case SHT_LOUSER:
+				printf("%-9s","LOUSER");
+				break;
+			case SHT_HIUSER:
+				printf("%-9s","HIUSER");
+				break;
+			default:
+				printf("%-9s","Unknown");
+				break;
+		}
+		printf("%08x %06x\n",sheader->sh_addr ,sheader->sh_offset);
+		
 	}
 }
+void show_section_name(const u_char *data)
+{
+	elf32_Ehdr *header;
+	elf32_Shdr *sheader;
+	int i, j;
+	int num;
+	int s_off;
+	u_char *name;
+	header = (elf32_Ehdr*)data;
+	num =  header->e_shnum;
+	s_off = header->e_shoff;
+	printf("Total %d section header, start from address 0x%x:\n\n", num,s_off);
+	sheader = (elf32_Shdr*)(data + s_off +  sizeof(*sheader) * (header->e_shstrndx));
+	name = (u_char *)(data + sheader->sh_offset);
+	printf("%x\t", sheader->sh_name );
+	printf("%06x\t%06x\n",sheader->sh_addr ,sheader->sh_offset);
+	printf("offset %x\n",sheader->sh_offset );
+	printf("name = %s\n", name+0x1b);
 
+}
 void show_all(const u_char *data)
 {
 	printf("all:\n");
@@ -462,6 +541,9 @@ int main(int argc, char *argv[])
 					case 'S':
 						show_section_header(buf);
 						break;
+					case 'n':
+						show_section_name(buf);
+						break;
 					case 'a':
 						show_all(buf);
 						break;
@@ -504,6 +586,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'S':
 			show_section_header(buf);
+			break;
+		case 'n':
+			show_section_name(buf);
 			break;
 		case 'a':
 			show_all(buf);
