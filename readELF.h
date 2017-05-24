@@ -101,10 +101,12 @@ typedef signed long long 			elf64_Sxword;
 #define SHT_HIUSER		0xffffffff	//
 
 /** sh_flags */
-#define SHF_WRITE		0x1
-#define SHF_ALLOC		0x2
-#define SHF_EXECINSTR	0x4
-#define SHF_MASKPROC		0xf0000000
+#define SHF_WRITE				0x1
+#define SHF_ALLOC				0x2
+#define SHF_EXECINSTR			0x4
+#define SHF_RELA_LIVEPATCH		0x00100000
+#define SHF_RO_AFTER_INIT		0x00200000
+#define SHF_MASKPROC				0xf0000000
 
 /** st_info */
 #define ELF32_ST_BIND(i)			((i)>>4)

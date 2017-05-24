@@ -2,7 +2,7 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-24 09:37:18
+* @Last Modified time: 2017-05-24 15:08:03
 */
 
 #include <stdio.h>
@@ -385,7 +385,7 @@ void show_section_header(const u_char *data)
 	printf("Total %d section header, start from address 0x%x:\n\n", num,s_off);
 	//sheader = (elf32_Shdr*)(data + s_off);
 	printf("Section header:\n");
-	printf(" [Nr] %-19s%-9s%-9s%-7s%-5s%-5s%-3s%-4s%-3s%-3s\n","Name","Type","Addr","Off","Size","Flag","Lk","Inf","Ali","Es");
+	printf(" [Nr] %-19s%-9s%-9s%-7s%-5s%-5s%-3s%-4s%-4s%-3s\n","Name","Type","Addr","Off","Size","Flag","Lk","Inf","Ali","Es");
 	sheader = (elf32_Shdr*)(data + s_off +  sizeof(*sheader) * (header->e_shstrndx));
 	name = (u_char *)(data + sheader->sh_offset);
 	for(i = 0; i < num; ++i)
@@ -447,7 +447,42 @@ void show_section_header(const u_char *data)
 				printf("%-9s","Unknown");
 				break;
 		}
-		printf("%08x %06x\n",sheader->sh_addr ,sheader->sh_offset);
+		printf("%08x %06x ",sheader->sh_addr ,sheader->sh_offset);
+		printf("%06x ", sheader->sh_size);
+		switch(sheader->sh_flags)
+		{
+			case SHF_WRITE:
+				printf("%-4s"," W ");
+				break;
+			case SHF_ALLOC:
+				printf("%-4s"," A ");
+				break;
+			case SHF_EXECINSTR:
+				printf("%-4s"," E ");
+				break;
+			case SHF_MASKPROC:
+				printf("%-4s"," M ");
+				break;
+			case SHF_WRITE | SHF_ALLOC:
+				printf("%-4s"," WA " );
+				break;
+			case SHF_WRITE | SHF_EXECINSTR:
+				printf("%-4s"," WE");
+				break;
+			case SHF_ALLOC | SHF_EXECINSTR:
+				printf("%-4s"," AE");
+				break;
+			case SHF_WRITE | SHF_ALLOC | SHF_EXECINSTR:
+				printf("%-4s"," WAE");
+				break;
+			default:
+				printf("%-4s"," U ");
+				break;
+		}
+		printf("%2x ", sheader->sh_link);
+		printf("%3x ", sheader->sh_info);
+		printf("%3x ", sheader->sh_addralign);
+		printf("%2x\n", sheader->sh_entsize);
 		
 	}
 }
