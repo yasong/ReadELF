@@ -123,6 +123,7 @@ typedef signed long long 			elf64_Sxword;
 /** ELF32_ST_TYPE */
 #define STT_NOTYPE		0
 #define STT_OBJECT		1
+#define STT_FUNC			2
 #define STT_SECTION		3
 #define STT_FILE			4
 #define STT_LOPROC		13

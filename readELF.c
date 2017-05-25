@@ -2,7 +2,7 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-22 20:58:36
+* @Last Modified time: 2017-05-25 21:20:57
 */
 
 #include <stdio.h>
@@ -526,8 +526,14 @@ void show_symbol(const u_char *data)
 	//printf("Total %d section header, start from address 0x%x:\n\n", num,s_off);
 	sheader = (elf32_Shdr*)(data + s_off +  sizeof(*sheader) * (header->e_shstrndx ));
 	secname = (u_char *)(data + sheader->sh_offset);
-	sheader = (elf32_Shdr*)(data + s_off +  sizeof(*sheader) * (header->e_shstrndx -1));
-	symname = (u_char *)(data + sheader->sh_offset);
+	for (i = 0; i < num; ++i)
+	{
+		sheader = (elf32_Shdr*)(data + i * sizeof(*sheader) + s_off);
+		if (strcmp( secname+sheader->sh_name, ".strtab")== 0)
+		{
+			symname = (u_char *)(data + sheader->sh_offset);
+		}
+	}
 	//printf("%x\t", sheader->sh_name );
 	//printf("%06x\t%06x\n",sheader->sh_addr ,sheader->sh_offset);
 	//printf("offset %x\n",sheader->sh_offset );
@@ -536,16 +542,67 @@ void show_symbol(const u_char *data)
 		sheader = (elf32_Shdr*)(data + i * sizeof(*sheader) + s_off);
 		if (strcmp( secname+sheader->sh_name, ".dynsym")== 0)
 		{
-			printf("name = %s\n", secname+sheader->sh_name);
 			len = (sheader->sh_size / sheader->sh_entsize);
-			printf("offset = %x\n",sheader->sh_offset );
+			//printf("offset = %x\n",sheader->sh_offset );
+			printf("Symbol table '.dynsym' contains %d entries:\n",len);
+			printf("\t[Nr] \tValue\tSize\tBind\tType\tInfo\tName\n");
 			for ( j = 0; j < len; ++j)
 			{
 				
-				
 				symheader = (elf32_sym*)(data + sheader->sh_offset + j * (sizeof(*symheader)));
-
-				printf("Name = %s\n",symname+symheader->st_name );
+				printf("\t%2d: ",j);
+				printf(" %08x\t",symheader->st_value );
+				printf("%4d\t",symheader->st_size );
+				switch(ELF32_ST_TYPE(symheader->st_info))
+				{
+					case STT_NOTYPE:
+						printf("NOTYPE\t");
+						break;
+					case STT_OBJECT:
+						printf("OBJECT\t");
+						break;
+					case STT_FUNC:
+						printf("FUNC\t");
+						break;
+					case STT_SECTION:
+						printf("SECTION\t");
+						break;
+					case STT_FILE:
+						printf("FILE\t");
+						break;
+					case STT_LOPROC:
+						printf("OBJECT\t");
+						break;
+					case STT_HIPROC:
+						printf("HIPROC");
+						break;
+					default:
+						printf("Unknown\t");
+						break;
+				}
+				switch(ELF32_ST_BIND(symheader->st_info))
+				{
+					case STB_LOCAL:
+						printf("LOCAL\t");
+						break;
+					case STB_GLOBAL:
+						printf("GLOBAL\t");
+						break;
+					case STB_WEAK:
+						printf("WEAK\t");
+						break;
+					case STB_LOPROC:
+						printf("OBJECT\t");
+						break;
+					case STB_HIPROC:
+						printf("HIPROC");
+						break;
+					default:
+						printf("Unknown\t");
+						break;
+				}
+				printf("\t");
+				printf(" %s\n",symname+symheader->st_name );
 				//symbol table .dynsym
 			}
 			
@@ -553,15 +610,66 @@ void show_symbol(const u_char *data)
 		}
 		if (strcmp( secname+sheader->sh_name, ".symtab")== 0)
 		{
-			printf("name = %s\n", secname+sheader->sh_name);
 			len = (sheader->sh_size / sheader->sh_entsize);
-			printf("offset = %x\n",sheader->sh_offset );
+			printf("Symbol table '.symtab' contains %d entries:\n",len);
+			printf("\t[Nr] \tValue\tSize\tBind\tType\tInfo\tName\n");
 			for ( j = 0; j < len; ++j)
 			{
 				
 				symheader = (elf32_sym*)(data + sheader->sh_offset + j * (sizeof(*symheader)));
-
-				printf("Name = %s\n",symname+symheader->st_name );
+				printf("\t%-2d: ",j);
+				printf(" %08x\t",symheader->st_value );
+				printf("%4d\t",symheader->st_size );
+				switch(ELF32_ST_TYPE(symheader->st_info))
+				{
+					case STT_NOTYPE:
+						printf("NOTYPE\t");
+						break;
+					case STT_OBJECT:
+						printf("OBJECT\t");
+						break;
+					case STT_FUNC:
+						printf("FUNC\t");
+						break;
+					case STT_SECTION:
+						printf("SECTION\t");
+						break;
+					case STT_FILE:
+						printf("FILE\t");
+						break;
+					case STT_LOPROC:
+						printf("OBJECT\t");
+						break;
+					case STT_HIPROC:
+						printf("HIPROC");
+						break;
+					default:
+						printf("Unknown\t");
+						break;
+				}
+				switch(ELF32_ST_BIND(symheader->st_info))
+				{
+					case STB_LOCAL:
+						printf("LOCAL\t");
+						break;
+					case STB_GLOBAL:
+						printf("GLOBAL\t");
+						break;
+					case STB_WEAK:
+						printf("WEAK\t");
+						break;
+					case STB_LOPROC:
+						printf("OBJECT\t");
+						break;
+					case STB_HIPROC:
+						printf("HIPROC");
+						break;
+					default:
+						printf("Unknown\t");
+						break;
+				}
+				printf("\t" );
+				printf("%s\n",symname+symheader->st_name );
 				//symbol table .dynsym
 			}
 		}
@@ -573,7 +681,13 @@ void show_symbol(const u_char *data)
 }
 void show_all(const u_char *data)
 {
-	printf("all:\n");
+	show_header(data);
+	printf("\n\n");
+	show_program_header(data);
+	printf("\n\n");
+	show_section_header(data);
+	printf("\n\n");
+	show_symbol(data);
 }
 
 void show_version()
@@ -621,10 +735,11 @@ int main(int argc, char *argv[])
 				printf("File %s cannot be opened\n", argv[1]);
 				exit(-1);
 			}
+			show_usage();
 			len = fread(buf,1,MAX_LEN,elf);
 			buf[len] = '\0';
 			printf("cmd> ");
-			scanf("%c",&cmd);
+			scanf("%s",&cmd);
 			while(cmd != 'q')
 			{
 				switch(cmd)
@@ -657,8 +772,8 @@ int main(int argc, char *argv[])
 						break;
 				}
 				printf("cmd> ");
-				scanf("%c",&cmd);
-				scanf("%c",&cmd);
+				scanf("%s",&cmd);
+				//scanf("%c",&cmd);
 			}
 			fclose(elf);
 			return 0;
