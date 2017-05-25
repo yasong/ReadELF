@@ -2,10 +2,11 @@
 * @Author: Xiaokang Yin
 * @Date:   2017-05-21 22:03:36
 * @Last Modified by:   Xiaokang Yin
-* @Last Modified time: 2017-05-24 15:08:03
+* @Last Modified time: 2017-05-22 20:58:36
 */
 
 #include <stdio.h>
+#include <string.h>
 #include "readELF.h"
 #define MAX_LEN		60*1024*1024
 const char software_name[] = "readELF";
@@ -29,7 +30,8 @@ void show_usage()
 		   "  -H : show the usage information\n\n"
 		   "  -h <elf file> : display the header information\n\n"
 		   "  -a <elf file> : display all the information\n\n"
-		   "  -S<elf file> : display the section  header information\n\n"
+		   "  -S <elf file> : display the section  header information\n\n"
+		   "  -s <elf file>  : display symbol table\n\n"
 		   "  -v : Displaye the version number of readELF\n\n"
 		);
 	printf("or\n\n");
@@ -40,6 +42,7 @@ void show_usage()
 		   "  h : display the header information\n\n"
 		   "  a : display all the information\n\n"
 		   "  S : display the section  header information\n\n"
+		   "  s : display symbol table\n\n"
 		   "  v : Displaye the version number of readELF"
 		   "  q: quit the command shell\n\n"
 		);
@@ -479,8 +482,8 @@ void show_section_header(const u_char *data)
 				printf("%-4s"," U ");
 				break;
 		}
-		printf("%2x ", sheader->sh_link);
-		printf("%3x ", sheader->sh_info);
+		printf("%2d ", sheader->sh_link);
+		printf("%3xd", sheader->sh_info);
 		printf("%3x ", sheader->sh_addralign);
 		printf("%2x\n", sheader->sh_entsize);
 		
@@ -504,6 +507,68 @@ void show_section_name(const u_char *data)
 	printf("%06x\t%06x\n",sheader->sh_addr ,sheader->sh_offset);
 	printf("offset %x\n",sheader->sh_offset );
 	printf("name = %s\n", name+0x1b);
+
+}
+void show_symbol(const u_char *data)
+{
+	elf32_Ehdr *header;
+	elf32_Shdr *sheader;
+	elf32_sym    *symheader;
+	int i, j;
+	int num;
+	int len;
+	int s_off;
+	u_char *secname;
+	u_char *symname;
+	header = (elf32_Ehdr*)data;
+	num =  header->e_shnum;
+	s_off = header->e_shoff;
+	//printf("Total %d section header, start from address 0x%x:\n\n", num,s_off);
+	sheader = (elf32_Shdr*)(data + s_off +  sizeof(*sheader) * (header->e_shstrndx ));
+	secname = (u_char *)(data + sheader->sh_offset);
+	sheader = (elf32_Shdr*)(data + s_off +  sizeof(*sheader) * (header->e_shstrndx -1));
+	symname = (u_char *)(data + sheader->sh_offset);
+	//printf("%x\t", sheader->sh_name );
+	//printf("%06x\t%06x\n",sheader->sh_addr ,sheader->sh_offset);
+	//printf("offset %x\n",sheader->sh_offset );
+	for (i = 0; i < num; ++i)
+	{
+		sheader = (elf32_Shdr*)(data + i * sizeof(*sheader) + s_off);
+		if (strcmp( secname+sheader->sh_name, ".dynsym")== 0)
+		{
+			printf("name = %s\n", secname+sheader->sh_name);
+			len = (sheader->sh_size / sheader->sh_entsize);
+			printf("offset = %x\n",sheader->sh_offset );
+			for ( j = 0; j < len; ++j)
+			{
+				
+				
+				symheader = (elf32_sym*)(data + sheader->sh_offset + j * (sizeof(*symheader)));
+
+				printf("Name = %s\n",symname+symheader->st_name );
+				//symbol table .dynsym
+			}
+			
+
+		}
+		if (strcmp( secname+sheader->sh_name, ".symtab")== 0)
+		{
+			printf("name = %s\n", secname+sheader->sh_name);
+			len = (sheader->sh_size / sheader->sh_entsize);
+			printf("offset = %x\n",sheader->sh_offset );
+			for ( j = 0; j < len; ++j)
+			{
+				
+				symheader = (elf32_sym*)(data + sheader->sh_offset + j * (sizeof(*symheader)));
+
+				printf("Name = %s\n",symname+symheader->st_name );
+				//symbol table .dynsym
+			}
+		}
+
+
+	}
+	
 
 }
 void show_all(const u_char *data)
@@ -576,6 +641,9 @@ int main(int argc, char *argv[])
 					case 'S':
 						show_section_header(buf);
 						break;
+					case 's':
+						show_symbol(buf);
+						break;
 					case 'n':
 						show_section_name(buf);
 						break;
@@ -621,6 +689,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'S':
 			show_section_header(buf);
+			break;
+		case 's':
+			show_symbol(buf);
 			break;
 		case 'n':
 			show_section_name(buf);
